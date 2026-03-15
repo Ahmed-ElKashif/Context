@@ -1,0 +1,715 @@
+<!doctype html>
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Context - Comparison Engine</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+      rel="stylesheet"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ["Rajdhani", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
+              mono: ["Fira Code", "monospace"],
+            },
+            colors: {
+              light: {
+                bg: "#F8F9FA",
+                surface: "#FFFFFF",
+                primary: "#103766",
+                accent: "#FF7E5F",
+                text: "#242C34",
+                border: "#E2E8F0",
+              },
+              dark: {
+                bg: "#0B0B0D",
+                surface: "#18181B",
+                primary: "#8B5CF6",
+                secondary: "#3B82F6",
+                text: "#E0E0E6",
+                border: "#27272A",
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <script>
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+
+      function toggleTheme() {
+        if (document.documentElement.classList.contains("dark")) {
+          document.documentElement.classList.remove("dark");
+          localStorage.theme = "light";
+        } else {
+          document.documentElement.classList.add("dark");
+          localStorage.theme = "dark";
+        }
+      }
+    </script>
+
+    <style>
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(128, 128, 128, 0.2);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(128, 128, 128, 0.4);
+      }
+      * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .fill-icon {
+        font-variation-settings: "FILL" 1;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text antialiased font-sans transition-colors duration-300 min-w-[320px] selection:bg-light-primary selection:text-white dark:selection:bg-dark-primary dark:selection:text-black"
+  >
+    <div class="flex h-screen overflow-hidden">
+      <aside
+        id="app-sidebar"
+        class="fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 md:static w-64 flex-shrink-0 border-r border-light-border dark:border-white/5 bg-light-surface dark:bg-dark-surface flex flex-col z-50 transition-transform duration-300 shadow-xl md:shadow-none"
+      >
+        <div class="p-6 relative">
+          <button
+            onclick="
+              document
+                .getElementById('app-sidebar')
+                .classList.add('-translate-x-full')
+            "
+            class="md:hidden absolute top-4 right-4 p-2 text-light-text/80 dark:text-dark-text/50 hover:text-light-primary dark:hover:text-dark-primary"
+          >
+            <span class="material-symbols-rounded">close</span>
+          </button>
+
+          <div class="flex items-center gap-3 mb-8">
+            <a
+              href="#"
+              onclick="
+                window.location.reload();
+                return false;
+              "
+              class="group focus:outline-none flex items-center gap-3"
+            >
+              <div class="relative w-8 h-8">
+                <div
+                  class="relative w-full h-full bg-light-surface dark:bg-dark-surface border border-light-border dark:border-white/10 rounded-lg flex items-center justify-center shadow-sm overflow-hidden"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    viewBox="0 0 100 100"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="30"
+                      cy="30"
+                      r="6"
+                      class="fill-light-text/60 dark:fill-white/40"
+                    />
+                    <path
+                      d="M30 30 C 30 30, 45 45, 50 50"
+                      stroke="currentColor"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                      class="text-light-border dark:text-white/20"
+                    />
+                    <circle
+                      cx="70"
+                      cy="30"
+                      r="6"
+                      class="fill-light-text/60 dark:fill-white/40"
+                    />
+                    <path
+                      d="M70 30 C 70 30, 55 45, 50 50"
+                      stroke="currentColor"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                      class="text-light-border dark:text-white/20"
+                    />
+                    <circle
+                      cx="50"
+                      cy="80"
+                      r="6"
+                      class="fill-light-primary dark:fill-dark-secondary/60"
+                    />
+                    <path
+                      d="M50 80 C 50 80, 50 65, 50 50"
+                      stroke="currentColor"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                      class="text-light-primary dark:text-dark-secondary/40"
+                    />
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="9"
+                      class="fill-light-primary dark:fill-dark-primary"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <span
+                class="text-2xl font-bold tracking-tight text-light-primary dark:text-white font-display"
+                >Context</span
+              >
+            </a>
+          </div>
+
+          <button
+            class="w-full flex items-center justify-center gap-2 bg-light-primary dark:bg-dark-primary hover:opacity-90 text-white dark:text-black py-2.5 rounded-lg font-bold transition-opacity mb-8 shadow-sm dark:shadow-[0_4px_14px_rgba(139,92,246,0.15)]"
+          >
+            <span class="material-symbols-rounded text-[20px]">add</span>
+            <span>New Analysis</span>
+          </button>
+
+          <nav class="space-y-1">
+            <p
+              class="px-3 text-xs font-bold text-light-primary dark:text-dark-text/40 uppercase tracking-widest mb-2 font-mono"
+            >
+              System
+            </p>
+            <a
+              class="flex items-center gap-3 px-3 py-2 rounded-lg text-light-text/80 dark:text-dark-text/70 hover:bg-light-border/50 dark:hover:bg-white/5 transition-colors font-medium"
+              href="./05-Dashboard.html"
+            >
+              <span class="material-symbols-rounded">dashboard</span>
+              <span>Dashboard</span>
+            </a>
+            <a
+              class="flex items-center gap-3 px-3 py-2 rounded-lg text-light-text/80 dark:text-dark-text/70 hover:bg-light-border/50 dark:hover:bg-white/5 transition-colors font-medium"
+              href="./07-SmartLibrary.html"
+            >
+              <span class="material-symbols-rounded">folder_open</span>
+              <span>All Files</span>
+            </a>
+            <a
+              class="flex items-center gap-3 px-3 py-2 rounded-lg bg-light-primary/10 dark:bg-dark-primary/10 text-light-primary dark:text-dark-primary font-bold"
+              href="#"
+            >
+              <span class="material-symbols-rounded fill-icon"
+                >compare_arrows</span
+              >
+              <span>Comparisons</span>
+            </a>
+            <a
+              class="flex items-center gap-3 px-3 py-2 rounded-lg text-light-text/80 dark:text-dark-text/70 hover:bg-light-border/50 dark:hover:bg-white/5 transition-colors font-medium"
+              href="./09-Settings.html"
+            >
+              <span class="material-symbols-rounded">settings</span>
+              <span>Settings</span>
+            </a>
+          </nav>
+        </div>
+
+        <div
+          class="mt-auto p-4 border-t border-light-border dark:border-white/5"
+        >
+          <div
+            class="bg-light-bg dark:bg-white/5 rounded-xl p-3 border border-light-border dark:border-white/5"
+          >
+            <div class="flex items-center gap-3 mb-3">
+              <div
+                class="w-10 h-10 rounded-full bg-gradient-to-br from-light-primary to-light-accent dark:from-dark-primary dark:to-dark-secondary flex items-center justify-center text-white font-bold"
+              >
+                AH
+              </div>
+              <div class="overflow-hidden">
+                <p class="text-sm font-bold truncate dark:text-white">Ahmed</p>
+                <p
+                  class="text-xs font-semibold text-light-primary dark:text-dark-text/60 truncate"
+                >
+                  Pro Account
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="flex-1 flex flex-col overflow-hidden relative">
+        <header
+          class="h-16 border-b border-light-border dark:border-white/5 bg-light-surface dark:bg-dark-surface flex items-center justify-between px-8 shrink-0 z-10"
+        >
+          <div class="flex items-center gap-4 flex-1">
+            <button
+              onclick="
+                document
+                  .getElementById('app-sidebar')
+                  .classList.remove('-translate-x-full')
+              "
+              class="md:hidden p-2 text-light-text/80 dark:text-dark-text/50 hover:bg-light-bg dark:hover:bg-white/5 rounded-lg"
+            >
+              <span class="material-symbols-rounded">menu</span>
+            </button>
+            <div
+              class="flex items-center gap-2 text-[10px] font-mono font-bold text-light-primary dark:text-dark-text/50 uppercase tracking-widest hidden sm:flex"
+            >
+              <a
+                href="#"
+                class="hover:text-light-text dark:hover:text-white flex items-center gap-1 transition-colors"
+              >
+                Library
+              </a>
+              <span class="material-symbols-rounded text-[14px]"
+                >chevron_right</span
+              >
+              <span class="text-light-text dark:text-white"
+                >Comparison Engine</span
+              >
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <button
+              class="flex items-center gap-2 px-3 py-1.5 bg-light-bg dark:bg-white/5 border border-light-border dark:border-white/10 rounded-lg text-xs font-bold text-light-text/80 dark:text-white/80 hover:text-light-primary dark:hover:text-white transition-colors shadow-sm"
+            >
+              <span class="material-symbols-rounded text-[16px]">download</span>
+              Export Report
+            </button>
+            <div class="h-4 w-px bg-light-border dark:bg-white/10"></div>
+            <button
+              onclick="toggleTheme()"
+              class="p-2 text-light-text/80 dark:text-dark-text/50 hover:bg-light-surface dark:hover:bg-white/5 rounded-lg transition-colors border border-transparent hover:border-light-border dark:hover:border-white/10"
+            >
+              <span class="material-symbols-rounded">contrast</span>
+            </button>
+          </div>
+        </header>
+
+        <div
+          class="flex-1 overflow-y-auto p-4 md:p-8 bg-light-bg dark:bg-dark-bg scroll-smooth relative"
+        >
+          <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse_at_top,rgba(16,55,102,0.04),transparent_70%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.04),transparent_70%)] pointer-events-none z-0"
+          ></div>
+
+          <div class="max-w-6xl mx-auto relative z-10 pb-24">
+            <div
+              class="relative flex flex-col md:flex-row items-center justify-between gap-6 md:gap-12 mb-10 w-full pt-4"
+            >
+              <div
+                class="absolute top-1/2 left-0 w-full h-px bg-light-border dark:bg-white/10 -z-10 hidden md:block"
+              ></div>
+
+              <div
+                class="flex-1 w-full bg-white dark:bg-dark-surface p-5 rounded-2xl border border-light-border dark:border-white/5 shadow-sm relative overflow-hidden group hover:border-light-primary/30 dark:hover:border-dark-secondary/30 transition-colors cursor-pointer"
+              >
+                <div
+                  class="absolute top-0 left-0 w-1 h-full bg-light-primary dark:bg-dark-secondary"
+                ></div>
+                <div
+                  class="absolute inset-0 bg-light-primary/5 dark:bg-dark-secondary/10 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10"
+                >
+                  <span
+                    class="bg-white dark:bg-dark-surface px-3 py-1.5 rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5 text-light-text dark:text-white"
+                  >
+                    <span class="material-symbols-rounded text-[16px]"
+                      >swap_horiz</span
+                    >
+                    Change File
+                  </span>
+                </div>
+                <div class="flex items-start justify-between mb-3">
+                  <div
+                    class="w-10 h-10 rounded-xl bg-light-bg dark:bg-black/20 flex items-center justify-center text-light-primary dark:text-dark-secondary border border-light-border dark:border-white/5"
+                  >
+                    <span class="material-symbols-rounded text-[20px]"
+                      >description</span
+                    >
+                  </div>
+                  <span
+                    class="text-[10px] font-bold font-mono border border-light-primary/20 dark:border-dark-secondary/30 px-2 py-1 rounded-md text-light-primary dark:text-dark-secondary bg-light-primary/5 dark:bg-dark-secondary/10"
+                    >Base File</span
+                  >
+                </div>
+                <h2
+                  class="text-base font-bold text-light-text dark:text-white truncate"
+                >
+                  MSA_Standard_Template.pdf
+                </h2>
+                <p
+                  class="text-xs font-medium text-light-text/60 dark:text-dark-text/50 mt-1"
+                >
+                  Uploaded Oct 12 • Version 1.0
+                </p>
+              </div>
+
+              <div
+                class="flex items-center justify-center bg-light-bg dark:bg-dark-bg p-2 rounded-full z-10 shrink-0 shadow-[0_0_0_8px_#F8F9FA] dark:shadow-[0_0_0_8px_#0B0B0D]"
+              >
+                <div
+                  class="w-10 h-10 rounded-full border border-light-border dark:border-white/10 bg-white dark:bg-dark-surface shadow-sm flex items-center justify-center text-xs font-black text-light-text/50 dark:text-white/50 font-mono tracking-tighter"
+                >
+                  VS
+                </div>
+              </div>
+
+              <div
+                class="flex-1 w-full bg-white dark:bg-dark-surface p-5 rounded-2xl border border-light-border dark:border-white/5 shadow-sm relative overflow-hidden group hover:border-light-accent/30 dark:hover:border-dark-primary/30 transition-colors cursor-pointer"
+              >
+                <div
+                  class="absolute top-0 right-0 w-1 h-full bg-light-accent dark:bg-dark-primary"
+                ></div>
+                <div
+                  class="absolute inset-0 bg-light-accent/5 dark:bg-dark-primary/10 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10"
+                >
+                  <span
+                    class="bg-white dark:bg-dark-surface px-3 py-1.5 rounded-lg text-xs font-bold shadow-md flex items-center gap-1.5 text-light-text dark:text-white"
+                  >
+                    <span class="material-symbols-rounded text-[16px]"
+                      >swap_horiz</span
+                    >
+                    Change File
+                  </span>
+                </div>
+                <div class="flex items-start justify-between mb-3">
+                  <div
+                    class="w-10 h-10 rounded-xl bg-light-bg dark:bg-black/20 flex items-center justify-center text-light-accent dark:text-dark-primary border border-light-border dark:border-white/5"
+                  >
+                    <span class="material-symbols-rounded text-[20px]"
+                      >description</span
+                    >
+                  </div>
+                  <span
+                    class="text-[10px] font-bold font-mono border border-light-accent/20 dark:border-dark-primary/30 px-2 py-1 rounded-md text-light-accent dark:text-dark-primary bg-light-accent/5 dark:bg-dark-primary/10"
+                    >Comparison File</span
+                  >
+                </div>
+                <h2
+                  class="text-base font-bold text-light-text dark:text-white truncate"
+                >
+                  MSA_Final_Redline.pdf
+                </h2>
+                <p
+                  class="text-xs font-medium text-light-text/60 dark:text-dark-text/50 mt-1"
+                >
+                  Uploaded Today • Version 2.4
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="bg-gradient-to-br from-white to-light-bg dark:from-dark-surface dark:to-[#121214] rounded-2xl p-6 md:p-8 border border-light-primary/20 dark:border-dark-primary/20 shadow-md mb-10 relative overflow-hidden"
+            >
+              <div
+                class="flex items-center gap-3 mb-5 border-b border-light-border dark:border-white/5 pb-4"
+              >
+                <div
+                  class="w-8 h-8 rounded-lg bg-light-primary dark:bg-dark-primary flex items-center justify-center text-white dark:text-black shadow-sm"
+                >
+                  <span class="material-symbols-rounded text-[18px]"
+                    >auto_awesome</span
+                  >
+                </div>
+                <h3
+                  class="text-lg font-black text-light-text dark:text-white tracking-tight"
+                >
+                  AI Synthesis
+                </h3>
+              </div>
+              <p
+                class="text-light-text/90 dark:text-white/90 leading-relaxed text-sm md:text-base font-medium"
+              >
+                While both documents cover the same overarching service
+                agreement structure, the
+                <span
+                  class="font-bold px-1.5 py-0.5 rounded bg-light-accent/10 dark:bg-dark-primary/20 text-light-accent dark:text-dark-primary"
+                  >Comparison File</span
+                >
+                shifts liability risk significantly toward the client. It
+                introduces strict new data residency constraints (EU-only) that
+                are not present in the base template, and entirely removes the
+                standard "Force Majeure" protections.
+              </p>
+              <div
+                class="flex gap-3 mt-6 pt-5 border-t border-light-border dark:border-white/5"
+              >
+                <span
+                  class="px-3 py-1.5 rounded-lg bg-white dark:bg-black/40 border border-light-border dark:border-white/10 text-xs font-bold font-mono text-light-text/80 dark:text-white/70 shadow-sm flex items-center gap-1.5"
+                  ><span class="material-symbols-rounded text-[14px]"
+                    >percent</span
+                  >
+                  Similarity: 85%</span
+                >
+                <span
+                  class="px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 text-xs font-bold font-mono text-red-700 dark:text-red-400 shadow-sm flex items-center gap-1.5"
+                  ><span class="material-symbols-rounded text-[14px]"
+                    >warning</span
+                  >
+                  Risk Delta: High</span
+                >
+              </div>
+            </div>
+
+            <div
+              class="bg-white dark:bg-dark-surface rounded-2xl border border-light-border dark:border-white/10 shadow-sm overflow-hidden flex flex-col"
+            >
+              <div
+                class="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-light-border dark:divide-white/10"
+              >
+                <div
+                  class="bg-light-primary/5 dark:bg-dark-secondary/5 p-6 space-y-5"
+                >
+                  <div
+                    class="flex items-center justify-between pb-3 border-b border-light-primary/10 dark:border-white/10"
+                  >
+                    <h4
+                      class="text-xs font-bold uppercase tracking-widest text-light-primary dark:text-dark-secondary font-mono"
+                    >
+                      Unique to Base
+                    </h4>
+                    <span
+                      class="material-symbols-rounded text-light-primary dark:text-dark-secondary text-[16px]"
+                      >remove_circle_outline</span
+                    >
+                  </div>
+
+                  <div
+                    class="bg-white dark:bg-[#121214] p-4 rounded-xl border border-light-border dark:border-white/5 shadow-sm group"
+                  >
+                    <h5
+                      class="font-bold text-sm text-light-text dark:text-white mb-2 line-through decoration-red-500/50"
+                    >
+                      Force Majeure Clause
+                    </h5>
+                    <p
+                      class="text-xs text-light-text/80 dark:text-dark-text/70 leading-relaxed font-medium"
+                    >
+                      Section 12.4 excuses delays caused by "acts of God" or
+                      internet outages. This is
+                      <span class="text-red-600 dark:text-red-400 font-bold"
+                        >missing</span
+                      >
+                      entirely.
+                    </p>
+                  </div>
+
+                  <div
+                    class="bg-white dark:bg-[#121214] p-4 rounded-xl border border-light-border dark:border-white/5 shadow-sm group"
+                  >
+                    <h5
+                      class="font-bold text-sm text-light-text dark:text-white mb-2"
+                    >
+                      Payment: Net 60
+                    </h5>
+                    <p
+                      class="text-xs text-light-text/80 dark:text-dark-text/70 leading-relaxed font-medium"
+                    >
+                      Original terms allowed for generous 60-day payment cycles.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="p-6 space-y-5">
+                  <div
+                    class="flex items-center justify-between pb-3 border-b border-light-border dark:border-white/10"
+                  >
+                    <h4
+                      class="text-xs font-bold uppercase tracking-widest text-light-text/60 dark:text-white/40 font-mono"
+                    >
+                      Shared Concepts
+                    </h4>
+                    <span
+                      class="material-symbols-rounded text-light-text/40 dark:text-white/30 text-[16px]"
+                      >done_all</span
+                    >
+                  </div>
+
+                  <div
+                    class="bg-light-bg dark:bg-[#121214] p-4 rounded-xl border border-light-border dark:border-white/5 shadow-sm flex items-start gap-3"
+                  >
+                    <span
+                      class="material-symbols-rounded text-[18px] text-light-text/50 dark:text-white/50 mt-0.5"
+                      >security</span
+                    >
+                    <div>
+                      <h5
+                        class="font-bold text-sm text-light-text dark:text-white mb-1"
+                      >
+                        SOC2 Compliance
+                      </h5>
+                      <p
+                        class="text-xs text-light-text/80 dark:text-dark-text/70 leading-relaxed font-medium"
+                      >
+                        Both documents strictly mandate annual SOC2 Type II
+                        audits.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div
+                    class="bg-light-bg dark:bg-[#121214] p-4 rounded-xl border border-light-border dark:border-white/5 shadow-sm flex items-start gap-3"
+                  >
+                    <span
+                      class="material-symbols-rounded text-[18px] text-light-text/50 dark:text-white/50 mt-0.5"
+                      >copyright</span
+                    >
+                    <div>
+                      <h5
+                        class="font-bold text-sm text-light-text dark:text-white mb-1"
+                      >
+                        IP Ownership
+                      </h5>
+                      <p
+                        class="text-xs text-light-text/80 dark:text-dark-text/70 leading-relaxed font-medium"
+                      >
+                        Client retains full, undisputed ownership of processed
+                        data.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="bg-light-accent/5 dark:bg-dark-primary/5 p-6 space-y-5"
+                >
+                  <div
+                    class="flex items-center justify-between pb-3 border-b border-light-accent/10 dark:border-white/10"
+                  >
+                    <h4
+                      class="text-xs font-bold uppercase tracking-widest text-light-accent dark:text-dark-primary font-mono"
+                    >
+                      Unique to Comparison
+                    </h4>
+                    <span
+                      class="material-symbols-rounded text-light-accent dark:text-dark-primary text-[16px]"
+                      >add_circle_outline</span
+                    >
+                  </div>
+
+                  <div
+                    class="bg-white dark:bg-[#121214] p-4 rounded-xl border border-light-accent/30 dark:border-dark-primary/30 shadow-sm group relative overflow-hidden"
+                  >
+                    <div
+                      class="absolute left-0 top-0 bottom-0 w-1 bg-light-accent dark:bg-dark-primary"
+                    ></div>
+                    <div class="flex justify-between items-start mb-2 pl-2">
+                      <h5
+                        class="font-bold text-sm text-light-text dark:text-white"
+                      >
+                        Liability Cap: 1.5x
+                      </h5>
+                      <span
+                        class="material-symbols-rounded text-[16px] text-orange-600 dark:text-orange-500"
+                        >warning</span
+                      >
+                    </div>
+                    <p
+                      class="text-xs text-light-text/80 dark:text-dark-text/70 leading-relaxed font-medium pl-2"
+                    >
+                      New clause caps liability at 1.5x ACV. This is a
+                      <span class="font-bold text-light-text dark:text-white"
+                        >significant reduction</span
+                      >.
+                    </p>
+                  </div>
+
+                  <div
+                    class="bg-white dark:bg-[#121214] p-4 rounded-xl border border-light-accent/30 dark:border-dark-primary/30 shadow-sm group relative overflow-hidden"
+                  >
+                    <div
+                      class="absolute left-0 top-0 bottom-0 w-1 bg-light-accent dark:bg-dark-primary"
+                    ></div>
+                    <h5
+                      class="font-bold text-sm text-light-text dark:text-white mb-2 pl-2"
+                    >
+                      EU Data Residency
+                    </h5>
+                    <p
+                      class="text-xs text-light-text/80 dark:text-dark-text/70 leading-relaxed font-medium pl-2"
+                    >
+                      Explicit requirement for data to remain in
+                      Frankfurt/Dublin.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="absolute bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-2xl z-30"
+        >
+          <div
+            class="bg-white dark:bg-[#18181B] border border-light-border dark:border-white/10 rounded-2xl shadow-2xl p-2 flex flex-col transition-all focus-within:ring-2 focus-within:ring-light-primary/20 dark:focus-within:ring-dark-primary/20 focus-within:border-light-primary dark:focus-within:border-dark-primary"
+          >
+            <div
+              class="flex items-end bg-light-bg dark:bg-[#0B0B0D] rounded-xl border border-light-border dark:border-white/5 p-1"
+            >
+              <span
+                class="p-3 text-light-text/40 dark:text-white/30 material-symbols-rounded shrink-0"
+                >smart_toy</span
+              >
+              <textarea
+                class="w-full bg-transparent border-none text-sm font-medium p-3 pb-3.5 max-h-32 min-h-[44px] resize-none outline-none placeholder:text-light-text/50 dark:placeholder:text-dark-text/50 text-light-text dark:text-white"
+                placeholder="Ask Context to compare specific clauses or find contradictions..."
+                rows="1"
+              ></textarea>
+              <button
+                class="p-2 m-1.5 bg-light-primary dark:bg-dark-primary text-white dark:text-black rounded-lg hover:opacity-90 transition-opacity shrink-0 shadow-sm flex items-center justify-center"
+              >
+                <span class="material-symbols-rounded text-[18px]"
+                  >arrow_upward</span
+                >
+              </button>
+            </div>
+            <div
+              class="flex items-center gap-2 px-3 pt-2 pb-1 overflow-x-auto no-scrollbar mask-gradient"
+            >
+              <span
+                class="text-[10px] font-bold uppercase tracking-widest text-light-text/40 dark:text-white/30 font-mono shrink-0 mr-1"
+                >Suggested</span
+              >
+              <button
+                class="text-[10px] font-semibold bg-light-bg dark:bg-white/5 px-2.5 py-1 rounded-md border border-light-border dark:border-white/10 text-light-text/70 dark:text-dark-text/70 hover:border-light-primary dark:hover:border-dark-primary transition-colors whitespace-nowrap"
+              >
+                "Summarize payment terms"
+              </button>
+              <button
+                class="text-[10px] font-semibold bg-light-bg dark:bg-white/5 px-2.5 py-1 rounded-md border border-light-border dark:border-white/10 text-light-text/70 dark:text-dark-text/70 hover:border-light-primary dark:hover:border-dark-primary transition-colors whitespace-nowrap"
+              >
+                "Did the governing law change?"
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

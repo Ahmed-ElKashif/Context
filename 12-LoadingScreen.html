@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Context - Boot Sequence</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ["Rajdhani", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
+              mono: ["Fira Code", "monospace"],
+            },
+            colors: {
+              light: {
+                bg: "#F8F9FA",
+                primary: "#103766", // Deep Blue
+                accent: "#FF7E5F", // Orange
+                text: "#242C34",
+                border: "#E2E8F0",
+              },
+              dark: {
+                bg: "#0A0A0C",
+                primary: "#8B5CF6", // Electric Violet
+                secondary: "#3B82F6", // Blue
+                text: "#E0E0E6",
+                border: "#27272A",
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* --- HARDWARE ACCELERATED GRID --- */
+      .bg-grid {
+        background-size: 40px 40px;
+        background-image:
+          linear-gradient(
+            to right,
+            rgba(128, 128, 128, 0.12) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(128, 128, 128, 0.12) 1px,
+            transparent 1px
+          );
+      }
+
+      /* --- SVG KEYFRAMES (GPU Optimized) --- */
+      .node {
+        opacity: 0;
+        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        transform-origin: center;
+        transform-box: fill-box;
+      }
+      .node-1 {
+        animation-delay: 0.1s;
+      }
+      .node-2 {
+        animation-delay: 0.3s;
+      }
+      .node-3 {
+        animation-delay: 0.5s;
+      }
+
+      .path-line {
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        animation: drawPath 0.8s ease-in-out forwards;
+      }
+      .path-1 {
+        animation-delay: 0.3s;
+      }
+      .path-2 {
+        animation-delay: 0.5s;
+      }
+      .path-3 {
+        animation-delay: 0.7s;
+      }
+
+      .core {
+        opacity: 0;
+        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        animation-delay: 1s;
+        transform-origin: center;
+        transform-box: fill-box;
+      }
+      .ring {
+        opacity: 0;
+        transform-origin: 50px 50px;
+        animation: pulseRing 2.5s infinite ease-out;
+        animation-delay: 1.2s;
+      }
+
+      /* --- LOADING DOTS ANIMATION --- */
+      .dot {
+        animation: loadBounce 1s infinite ease-in-out;
+      }
+      .dot-1 {
+        animation-delay: 0s;
+      }
+      .dot-2 {
+        animation-delay: 0.15s;
+      }
+      .dot-3 {
+        animation-delay: 0.3s;
+      }
+
+      @keyframes popIn {
+        0% {
+          opacity: 0;
+          transform: scale(0);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @keyframes drawPath {
+        0% {
+          stroke-dashoffset: 100;
+        }
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+      @keyframes pulseRing {
+        0% {
+          transform: scale(0.8);
+          opacity: 0.8;
+        }
+        70% {
+          transform: scale(1.5);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1.5);
+          opacity: 0;
+        }
+      }
+      @keyframes loadBounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-4px);
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="fixed inset-0 z-50 flex flex-col items-center justify-center w-full h-screen transition-colors duration-300 overflow-hidden bg-light-bg dark:bg-dark-bg font-sans"
+  >
+    <div class="absolute inset-0 pointer-events-none opacity-80 bg-grid"></div>
+
+    <div class="relative z-10 flex flex-col items-center justify-center">
+      <div
+        id="main-logo"
+        class="w-32 h-32 md:w-48 md:h-48 drop-shadow-xl dark:drop-shadow-[0_0_20px_rgba(139,92,246,0.2)] transition-all duration-300"
+      >
+        <svg
+          viewBox="0 0 100 100"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-full h-full"
+        >
+          <circle
+            cx="25"
+            cy="25"
+            r="7"
+            class="fill-light-text/70 dark:fill-dark-text/80 node node-1 transition-colors duration-300"
+          />
+          <path
+            d="M25 25 C 25 25, 40 45, 50 50"
+            stroke-width="5"
+            stroke-linecap="round"
+            class="stroke-light-primary/40 dark:stroke-dark-primary/50 path-line path-1 transition-colors duration-300"
+          />
+
+          <circle
+            cx="75"
+            cy="25"
+            r="7"
+            class="fill-light-text/70 dark:fill-dark-text/80 node node-2 transition-colors duration-300"
+          />
+          <path
+            d="M75 25 C 75 25, 60 45, 50 50"
+            stroke-width="5"
+            stroke-linecap="round"
+            class="stroke-light-primary/40 dark:stroke-dark-primary/50 path-line path-2 transition-colors duration-300"
+          />
+
+          <circle
+            cx="50"
+            cy="80"
+            r="7"
+            class="fill-light-accent dark:fill-dark-secondary node node-3 transition-colors duration-300"
+          />
+          <path
+            d="M50 80 C 50 80, 50 65, 50 50"
+            stroke-width="5"
+            stroke-linecap="round"
+            class="stroke-light-accent/70 dark:stroke-dark-secondary/80 path-line path-3 transition-colors duration-300"
+          />
+
+          <circle
+            cx="50"
+            cy="50"
+            r="14"
+            class="fill-light-primary dark:fill-dark-primary core transition-colors duration-300"
+          />
+
+          <circle
+            cx="50"
+            cy="50"
+            r="22"
+            stroke-width="2"
+            class="stroke-light-primary/15 dark:stroke-dark-primary/30 ring transition-colors duration-300"
+          />
+        </svg>
+      </div>
+
+      <div class="mt-8 flex flex-col items-center gap-3">
+        <span
+          class="font-mono text-xs md:text-sm font-bold tracking-widest text-light-primary dark:text-dark-primary uppercase animate-pulse"
+        >
+          Initializing Context Engine
+        </span>
+        <div class="flex gap-1.5">
+          <div
+            class="w-1.5 h-1.5 bg-light-primary dark:bg-dark-primary rounded-full dot dot-1"
+          ></div>
+          <div
+            class="w-1.5 h-1.5 bg-light-primary dark:bg-dark-primary rounded-full dot dot-2"
+          ></div>
+          <div
+            class="w-1.5 h-1.5 bg-light-primary dark:bg-dark-primary rounded-full dot dot-3"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="absolute bottom-6 flex gap-4 z-50">
+      <button
+        onclick="toggleTheme()"
+        class="bg-white dark:bg-[#18181B] border border-light-border dark:border-white/10 text-light-text dark:text-white px-4 py-2 rounded-lg font-mono text-[10px] font-bold uppercase tracking-widest hover:bg-light-bg dark:hover:bg-white/5 transition-colors shadow-sm"
+      >
+        Toggle Theme
+      </button>
+      <button
+        onclick="replayAnimations()"
+        class="bg-light-primary dark:bg-dark-primary text-white dark:text-black px-4 py-2 rounded-lg font-mono text-[10px] uppercase tracking-widest font-black hover:opacity-90 active:scale-95 transition-all shadow-md"
+      >
+        Replay
+      </button>
+    </div>
+
+    <script>
+      function toggleTheme() {
+        document.documentElement.classList.toggle("dark");
+        // No need to replay animation automatically, but you can if you want it to trigger on switch
+      }
+
+      function replayAnimations() {
+        // Drastically simplified logic for a single SVG
+        const logo = document.getElementById("main-logo");
+        const newLogo = logo.cloneNode(true);
+        logo.parentNode.replaceChild(newLogo, logo);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,421 @@
+<!doctype html>
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Context - AI Processing</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+      rel="stylesheet"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ["Rajdhani", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
+              mono: ["Fira Code", "monospace"],
+            },
+            colors: {
+              light: {
+                bg: "#F8F9FA",
+                surface: "#FFFFFF",
+                primary: "#103766", // Deep Blue
+                accent: "#FF7E5F", // Orange
+                text: "#242C34",
+                border: "#E2E8F0",
+              },
+              dark: {
+                bg: "#0B0B0D", // Deep Black
+                surface: "#18181B",
+                primary: "#8B5CF6", // Electric Violet
+                secondary: "#3B82F6", // Blue Accent
+                text: "#E0E0E6",
+                border: "#27272A",
+              },
+            },
+            animation: {
+              scan: "scan 2s linear infinite",
+            },
+            keyframes: {
+              scan: {
+                "0%": { top: "0%" },
+                "100%": { top: "100%" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <script>
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+
+      function toggleTheme() {
+        if (document.documentElement.classList.contains("dark")) {
+          document.documentElement.classList.remove("dark");
+          localStorage.theme = "light";
+        } else {
+          document.documentElement.classList.add("dark");
+          localStorage.theme = "dark";
+        }
+      }
+    </script>
+
+    <style>
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(128, 128, 128, 0.2);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(128, 128, 128, 0.4);
+      }
+
+      * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .fill-icon {
+        font-variation-settings: "FILL" 1;
+      }
+
+      .bg-grid {
+        background-size: 40px 40px;
+        background-image:
+          linear-gradient(
+            to right,
+            rgba(128, 128, 128, 0.05) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(128, 128, 128, 0.05) 1px,
+            transparent 1px
+          );
+      }
+
+      .typing-effect::after {
+        content: "|";
+        animation: blink 1s infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="bg-light-bg dark:bg-[#0A0A0C] text-light-text dark:text-dark-text antialiased font-sans h-screen flex flex-col overflow-hidden relative min-w-[320px] transition-colors duration-300 selection:bg-light-primary selection:text-white dark:selection:bg-dark-primary dark:selection:text-black"
+  >
+    <header class="flex items-center justify-between px-8 py-6 z-20">
+      <div class="flex items-center gap-4">
+        <a href="#" class="group focus:outline-none flex items-center gap-3">
+          <div class="relative w-8 h-8">
+            <div
+              class="relative w-full h-full bg-light-surface dark:bg-dark-surface border border-light-border dark:border-white/10 rounded-lg flex items-center justify-center overflow-hidden shadow-sm transition-colors"
+            >
+              <svg
+                class="w-5 h-5"
+                viewBox="0 0 100 100"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle
+                  cx="30"
+                  cy="30"
+                  r="6"
+                  class="fill-light-text/40 dark:fill-white/40"
+                />
+                <path
+                  d="M30 30 C 30 30, 45 45, 50 50"
+                  stroke="currentColor"
+                  stroke-width="4"
+                  stroke-linecap="round"
+                  class="text-light-border dark:text-white/20"
+                />
+                <circle
+                  cx="70"
+                  cy="30"
+                  r="6"
+                  class="fill-light-text/40 dark:fill-white/40"
+                />
+                <path
+                  d="M70 30 C 70 30, 55 45, 50 50"
+                  stroke="currentColor"
+                  stroke-width="4"
+                  stroke-linecap="round"
+                  class="text-light-border dark:text-white/20"
+                />
+                <circle
+                  cx="50"
+                  cy="80"
+                  r="6"
+                  class="fill-light-accent/60 dark:fill-dark-secondary/60"
+                />
+                <path
+                  d="M50 80 C 50 80, 50 65, 50 50"
+                  stroke="currentColor"
+                  stroke-width="4"
+                  stroke-linecap="round"
+                  class="text-light-accent/40 dark:text-dark-secondary/40"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="9"
+                  class="fill-light-primary dark:fill-dark-primary"
+                />
+              </svg>
+            </div>
+          </div>
+          <span
+            class="text-2xl font-bold tracking-tight text-light-primary dark:text-white font-display"
+            >Context</span
+          >
+        </a>
+
+        <div
+          class="h-6 w-px bg-light-border dark:bg-white/10 hidden md:block"
+        ></div>
+        <span
+          class="text-sm font-mono font-bold text-light-primary dark:text-dark-primary uppercase tracking-widest hidden md:block"
+          >Neural Engine</span
+        >
+      </div>
+
+      <div class="flex items-center gap-6">
+        <button
+          onclick="toggleTheme()"
+          class="p-2 text-light-text/50 dark:text-dark-text/50 hover:text-light-primary dark:hover:text-dark-primary transition-colors"
+        >
+          <span class="material-symbols-rounded">contrast</span>
+        </button>
+        <button
+          class="text-sm font-bold text-light-text/60 dark:text-dark-text/50 hover:text-red-600 dark:hover:text-red-500 transition-colors"
+        >
+          Cancel Processing
+        </button>
+      </div>
+    </header>
+
+    <main
+      class="flex-1 flex flex-col items-center justify-center p-6 relative z-10 bg-grid"
+    >
+      <div
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(16,55,102,0.06),transparent_60%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.08),transparent_60%)] pointer-events-none z-0"
+      ></div>
+
+      <div
+        class="w-full max-w-2xl bg-white dark:bg-[#18181B] rounded-[2rem] border border-light-border dark:border-white/10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row z-10"
+      >
+        <div
+          class="w-full md:w-1/3 bg-light-bg/50 dark:bg-[#121214]/50 border-b md:border-b-0 md:border-r border-light-border dark:border-white/5 p-6 flex flex-col items-center justify-center relative overflow-hidden group"
+        >
+          <div
+            class="absolute inset-x-0 h-0.5 bg-light-primary dark:bg-dark-primary shadow-[0_0_15px_rgba(16,55,102,0.6)] dark:shadow-[0_0_15px_rgba(139,92,246,0.6)] z-20 animate-scan"
+          ></div>
+
+          <div
+            class="w-20 h-24 bg-white dark:bg-white/5 border border-light-border dark:border-white/10 rounded-lg flex items-center justify-center mb-4 relative z-10 shadow-sm transition-colors"
+          >
+            <span
+              class="material-symbols-rounded text-4xl text-light-text/20 dark:text-white/20"
+              >description</span
+            >
+          </div>
+
+          <h3
+            class="text-xs font-mono font-bold text-light-text/60 dark:text-dark-text/60 text-center truncate w-full px-2"
+          >
+            Q3_Report_Final.pdf
+          </h3>
+          <p
+            class="text-[10px] font-bold tracking-widest uppercase text-light-text/40 dark:text-dark-text/40 mt-1"
+          >
+            4.2 MB • Processing
+          </p>
+        </div>
+
+        <div class="w-full md:w-2/3 p-8 flex flex-col justify-center">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="relative w-3 h-3">
+              <span
+                class="absolute inline-flex h-full w-full rounded-full bg-light-primary dark:bg-dark-primary opacity-50 animate-ping"
+              ></span>
+              <span
+                class="relative inline-flex rounded-full h-3 w-3 bg-light-primary dark:bg-dark-primary"
+              ></span>
+            </div>
+            <h2 class="text-xl font-bold text-light-text dark:text-white">
+              Analyzing Structure...
+            </h2>
+          </div>
+
+          <div
+            class="bg-light-bg dark:bg-[#0B0B0D] rounded-xl p-5 border border-light-border dark:border-white/10 font-mono text-xs mb-6 shadow-inner w-full flex flex-col transition-colors duration-300"
+          >
+            <div class="space-y-2.5 opacity-90 mb-4">
+              <p
+                class="text-light-text dark:text-white flex items-center gap-2 font-medium"
+              >
+                <span
+                  class="text-emerald-600 dark:text-emerald-500 font-bold text-[14px]"
+                  >✓</span
+                >
+                <span
+                  >Text extraction complete
+                  <span
+                    class="text-light-accent dark:text-dark-primary font-bold"
+                    >(14ms)</span
+                  ></span
+                >
+              </p>
+
+              <p
+                class="text-light-text dark:text-white flex items-center gap-2 font-medium"
+              >
+                <span
+                  class="text-emerald-600 dark:text-emerald-500 font-bold text-[14px]"
+                  >✓</span
+                >
+                <span
+                  >Metadata parsed:
+                  <span
+                    class="text-light-primary dark:text-dark-secondary font-bold"
+                    >Author=Ahmed</span
+                  ></span
+                >
+              </p>
+
+              <p
+                class="text-light-text dark:text-white font-medium mt-3 flex items-start gap-2"
+              >
+                <span
+                  class="text-light-accent dark:text-dark-primary font-bold text-[14px]"
+                  >></span
+                >
+                Detecting semantic clusters...
+              </p>
+
+              <div class="pl-6 space-y-2 text-light-text/80 dark:text-white/80">
+                <p class="flex items-center gap-2">
+                  <span
+                    class="w-1.5 h-1.5 rounded-full bg-light-primary dark:bg-dark-secondary shrink-0"
+                  ></span>
+                  "Financials"
+                  <span class="text-light-text/30 dark:text-white/20">|</span>
+                  <span class="text-light-text/60 dark:text-white/50"
+                    >Confidence:</span
+                  >
+                  <span
+                    class="text-light-primary dark:text-dark-secondary font-bold"
+                    >98%</span
+                  >
+                </p>
+                <p class="flex items-center gap-2">
+                  <span
+                    class="w-1.5 h-1.5 rounded-full bg-light-accent dark:bg-dark-primary shrink-0"
+                  ></span>
+                  "Q3 Strategy"
+                  <span class="text-light-text/30 dark:text-white/20">|</span>
+                  <span class="text-light-text/60 dark:text-white/50"
+                    >Confidence:</span
+                  >
+                  <span
+                    class="text-light-accent dark:text-dark-primary font-bold"
+                    >85%</span
+                  >
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="flex items-center gap-2 font-bold border-t border-light-border dark:border-white/10 pt-3"
+            >
+              <span
+                class="text-light-primary dark:text-dark-secondary animate-pulse text-[14px]"
+                >></span
+              >
+              <span
+                class="text-light-text dark:text-white typing-effect tracking-tight"
+                >Calculating Cognitive Load...</span
+              >
+            </div>
+          </div>
+
+          <div
+            class="bg-light-primary/5 dark:bg-dark-primary/10 rounded-xl p-4 border border-light-primary/20 dark:border-dark-primary/20 transition-colors"
+          >
+            <div class="flex items-start gap-3">
+              <span
+                class="material-symbols-rounded text-light-primary dark:text-dark-primary mt-0.5"
+                >folder_managed</span
+              >
+              <div>
+                <h4
+                  class="text-sm font-bold text-light-text dark:text-white tracking-tight"
+                >
+                  Smart Classification
+                </h4>
+                <p
+                  class="text-xs text-light-text/70 dark:text-white/70 mt-1.5 leading-relaxed font-medium"
+                >
+                  This document matches your
+                  <strong
+                    class="text-light-primary dark:text-dark-primary font-bold bg-light-primary/10 dark:bg-dark-primary/20 px-1.5 py-0.5 rounded border border-light-primary/20 dark:border-dark-primary/30"
+                    >/Financials/Reports</strong
+                  >
+                  folder. Automate move?
+                </p>
+              </div>
+            </div>
+
+            <div class="flex gap-3 mt-4 ml-8">
+              <button
+                class="px-4 py-2 bg-light-primary dark:bg-dark-primary text-white dark:text-black text-xs font-bold rounded-lg hover:opacity-90 active:scale-95 transition-all shadow-sm"
+              >
+                Confirm Move
+              </button>
+              <button
+                class="px-4 py-2 border border-light-border dark:border-white/10 text-xs font-bold text-light-text/60 dark:text-dark-text/50 rounded-lg hover:bg-white dark:hover:bg-white/5 hover:text-light-text dark:hover:text-white hover:shadow-sm dark:hover:shadow-none transition-all"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
